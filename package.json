@@ -1,0 +1,26 @@
+{
+  "name": "serverless-notification",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "dependencies": {
+    "aws-sdk": "^2.773.0"
+  },
+  "devDependencies": {
+    "serverless-localstack": "^0.4.27"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FlavioAandres/serverless-notification.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FlavioAandres/serverless-notification/issues"
+  },
+  "homepage": "https://github.com/FlavioAandres/serverless-notification#readme"
+}
