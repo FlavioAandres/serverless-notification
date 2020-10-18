@@ -1,0 +1,67 @@
+service: serverless-notification
+frameworkVersion: "2"
+plugins:
+  - serverless-localstack
+custom:
+  localstack:
+  stages:
+    - local
+  host: http://localhost 
+  edgePort: 4566 
+  autostart: true 
+provider:
+  name: aws
+  runtime: nodejs12.x
+  logs:
+    restApi: true
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - 'dynamodb:Query'
+        - 'dynamodb:Update'
+        - 'dynamodb:PutItem'
+        - 'dynamodb:BatchGet'
+        - 'dynamodb:Get'
+        - 'dynamodb:UpdateItem'
+      Resource:
+        Fn::GetAtt:
+          - DynamoWebSockets
+          - Arn
+         
+functions:
+  WSConnect:
+    handler: handler.connection
+    environment:
+      DYNAMO_TABLE_NAME:
+        Ref: DynamoWebSockets
+      DYNAMO_ARN:
+        Fn::GetAtt: [DynamoWebSockets, Arn]
+    events: 
+      - websocket: 
+          route: $connect
+      - websocket: 
+          route: $disconnect
+  WSRegisterConnection: 
+    handler: handler.register
+    environment: 
+      DYNAMO_TABLE_NAME:
+        Ref: DynamoWebSockets
+      DYNAMO_ARN:
+        Fn::GetAtt: [DynamoWebSockets, Arn]
+    events:
+      - websocket:
+          route: register 
+
+resources:
+  Resources:
+    DynamoWebSockets:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: WebSocketConnections
+        AttributeDefinitions:
+          - AttributeName: connectionId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: connectionId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
