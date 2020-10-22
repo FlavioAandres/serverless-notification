@@ -11,6 +11,7 @@ custom:
   autostart: true 
 provider:
   name: aws
+  stage: test
   runtime: nodejs12.x
   logs:
     restApi: true
@@ -19,6 +20,7 @@ provider:
       Action:
         - 'dynamodb:Query'
         - 'dynamodb:Update'
+        - 'dynamodb:Scan'
         - 'dynamodb:PutItem'
         - 'dynamodb:BatchGet'
         - 'dynamodb:Get'
@@ -27,31 +29,43 @@ provider:
         Fn::GetAtt:
           - DynamoWebSockets
           - Arn
+  environment: 
+    DYNAMO_TABLE_NAME:
+      Ref: DynamoWebSockets
+    DYNAMO_ARN:
+      Fn::GetAtt: [DynamoWebSockets, Arn]
          
 functions:
   WSConnect:
-    handler: handler.connection
-    environment:
-      DYNAMO_TABLE_NAME:
-        Ref: DynamoWebSockets
-      DYNAMO_ARN:
-        Fn::GetAtt: [DynamoWebSockets, Arn]
+    handler: ./src/websockets.connection
     events: 
       - websocket: 
           route: $connect
       - websocket: 
           route: $disconnect
   WSRegisterConnection: 
-    handler: handler.register
-    environment: 
-      DYNAMO_TABLE_NAME:
-        Ref: DynamoWebSockets
-      DYNAMO_ARN:
-        Fn::GetAtt: [DynamoWebSockets, Arn]
+    handler: ./src/websockets.register
     events:
       - websocket:
           route: register 
-
+  WSBroadCastMessage: 
+    handler: ./src/websockets.broadcast
+    events:
+      - websocket:
+          route: broadcast 
+  WSBackendNotification: 
+    handler: ./src/sns_lambdas.receiveWSNotification
+    environment: 
+      API_GATEWAY_DOMAIN: 
+        Fn::Join:
+          - ""
+          - - "https://"
+            - Ref: "WebsocketsApi"
+            - ".execute-api."
+            - ${self:provider.region}
+            - ".amazonaws.com/"
+            - ${self:provider.stage}
+      
 resources:
   Resources:
     DynamoWebSockets:

@@ -1,0 +1,3 @@
+{
+    "body": "{\"types\":[\"MAIL_REQUEST\",\"WS_REQUEST\"],\"users\":[{\"userId\":123,\"fields\":\"value\"}],\"room\":\"roomid_hashed\",\"websocketData\":{\"action\":\"PUBLICATION_REQUESTED\",\"value\":\"data\"},\"emailData\":{\"body\":\"<body></body>\",\"subject\":\"Email subject\"}}"
+}
