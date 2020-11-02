@@ -55,6 +55,14 @@ functions:
           route: broadcast 
   WSBackendNotification: 
     handler: ./src/sns_lambdas.receiveWSNotification
+    events: 
+      - sns: 
+          arn:
+            Ref: ServerlessNotificationTopic
+          topicName: ServerlessNotificationTopic
+          filterPolicy: 
+            types: 
+              - WS_REQUEST
     environment: 
       API_GATEWAY_DOMAIN: 
         Fn::Join:
@@ -79,3 +87,7 @@ resources:
           - AttributeName: connectionId
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
+    ServerlessNotificationTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: "ServerlessNotificationTopic"

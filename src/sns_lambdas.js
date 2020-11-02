@@ -6,8 +6,8 @@ const {
 } = process.env
 
 module.exports.receiveWSNotification = async (event) => {
-  const { body } = event;
-  const { users, room, websocketData } = JSON.parse(body);
+  const { Records } = event;
+  const { users, room, websocketData } = JSON.parse(Records[0].Sns.Message);
   const params = {
     TableName: process.env.DYNAMO_TABLE_NAME,
     ExpressionAttributeValues: {},
@@ -20,6 +20,9 @@ module.exports.receiveWSNotification = async (event) => {
       return `:${index}`
     });
     params.FilterExpression = `userId IN (${bindData.toString()})`;
+  }else if(room){
+    params.FilterExpression = `roomId = :roomId`
+    params.ExpressionAttributeValues[":roomId"] = room
   }
   //search connections
   const result = await DynamoDocument.scan(params).promise();
