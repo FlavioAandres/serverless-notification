@@ -12,6 +12,7 @@ custom:
 provider:
   name: aws
   stage: test
+  memorySize: 128
   runtime: nodejs12.x
   logs:
     restApi: true
@@ -87,6 +88,9 @@ resources:
           - AttributeName: connectionId
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
+        TimeToLiveSpecification:
+            AttributeName: 'ttl'
+            Enabled: true 
     ServerlessNotificationTopic:
       Type: AWS::SNS::Topic
       Properties:

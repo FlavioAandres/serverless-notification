@@ -8,6 +8,7 @@ Message to push to SNS
 ```json
 {
     "types":["MAIL_REQUEST", "WS_REQUEST"],
+    "broadcast": true,
     "users":[{"userId": 123, "fields": "value"}],
     "room": "roomid_hashed",
     "websocketData": {

@@ -13,7 +13,8 @@ const connection = async (event) => {
     TableName: process.env.DYNAMO_TABLE_NAME,
     Item: {
       connectionId,
-      connectedAt
+      connectedAt,
+      ttl: Date.now() + ( 2 * 60 )
     }
   }
   await DynamoDocument.put(params).promise()
@@ -33,8 +34,7 @@ const registerUser = async (event)=>{
   const ParsedBody = JSON.parse(body)
   
   if(
-    !ParsedBody.data ||
-    !ParsedBody.data.userId
+    !ParsedBody.data
   ) return ; 
 
   const {
@@ -42,16 +42,28 @@ const registerUser = async (event)=>{
     roomId = ''
   } = ParsedBody.data
   
+  let UpdateExpressionSet = [], ExpressionAttributeValuesSet = {}
+  
+  if(userId){ 
+    UpdateExpressionSet.push('userId = :userValue')
+    ExpressionAttributeValuesSet[':userValue'] = userId
+  }
+
+  if(roomId){
+    ExpressionAttributeValuesSet[':roomValue'] = roomId
+    UpdateExpressionSet.push('roomId = :roomValue')
+  }
+
+  // ExpressionAttributeValuesSet[':ttlValue'] = Date.now() + (1 * 60)
+  // UpdateExpressionSet.push('ttl = :ttlValue')
+
   const params = {
     TableName: process.env.DYNAMO_TABLE_NAME,
     Key: {
       connectionId
     },
-    UpdateExpression: "set userId = :userValue, roomId = :roomValue",
-    ExpressionAttributeValues: {
-      ":userValue": `${userId}`,
-      ":roomValue": `${roomId}`,
-    },
+    UpdateExpression: "set " + UpdateExpressionSet.join(','),
+    ExpressionAttributeValues: ExpressionAttributeValuesSet
   }
   
   await DynamoDocument
