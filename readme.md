@@ -78,7 +78,7 @@ const message_notification = {
         type: "NEW_COMMENT",
         comment: {
             id: 'x72n9c3j90xm',
-            body: 'this is a new commend', 
+            body: 'this is a new comment', 
         }
     }
 }
