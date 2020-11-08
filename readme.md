@@ -72,9 +72,20 @@ const SNSInstance = new AWS.SNS({
     secretAccessKey: AWS_SECRET_KEY,
 })
 
+const message_notification = {
+    users: [{userId: 123}],
+    websocketData: {
+        type: "NEW_COMMENT",
+        comment: {
+            id: 'x72n9c3j90xm',
+            body: 'this is a new commend', 
+        }
+    }
+}
+
     
 const params = {
-    Message: JSON.stringify(message),
+    Message: JSON.stringify(message_notification),
     TopicArn: AWS_ARN_TOPIC_ARN,
     MessageAttributes: {
         'types': {
